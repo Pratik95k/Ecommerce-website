@@ -2,9 +2,19 @@
   <img src="Logo.png" alt="NovaStore Logo" width="340">
 </p>
 
-# NovaStore — Full-Stack E-Commerce Platform
+# NovaStore — Modern E-Commerce Platform
 
-NovaStore is a modern, responsive, full-stack e-commerce web application with embedded SQLite persistence, secure JWT authentication with Role-Based Access Control (RBAC), customer order tracking, and an executive administration dashboard.
+<p align="center">
+  <a href="https://pratik95k.github.io/Ecommerce-website/"><img src="https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-2ea44f?style=for-the-badge&logo=github" alt="Live Demo on GitHub Pages"></a>
+  <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="MIT License">
+</p>
+
+NovaStore is a modern, responsive e-commerce web application featuring dynamic catalog management, persistent shopping cart, customer order tracking, and an executive administration dashboard.
+
+> 🌐 **Live Website**: [https://pratik95k.github.io/Ecommerce-website/](https://pratik95k.github.io/Ecommerce-website/)  
+> NovaStore operates seamlessly in **Dual-Mode**:
+> - **GitHub Pages / Static Mode**: In-browser client storage engine (`localStorage`) supporting product catalog CRUD, demo logins, cart checkout, order tracking, and real-time Chart.js analytics with zero backend setup.
+> - **Full-Stack Mode**: Node.js & Express.js REST API with embedded SQLite database, JWT authentication, and transactional order fulfillment.
 
 ---
 
