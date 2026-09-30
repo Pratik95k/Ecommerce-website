@@ -6,6 +6,13 @@
   <meta name="description" content="Discover premium quality products at NovaStore - Modern E-Commerce shopping experience with fast delivery and great deals.">
   <title>NovaStore | Modern E-Commerce Store</title>
 
+  <!-- Favicon Package -->
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon_io/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon_io/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon_io/favicon-16x16.png">
+  <link rel="manifest" href="favicon_io/site.webmanifest">
+  <link rel="shortcut icon" href="favicon_io/favicon.ico">
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,10 +35,9 @@
   <!-- 1. NAVIGATION BAR -->
   <nav class="navbar navbar-expand-lg fixed-top shadow-sm border-bottom" id="mainNavbar">
     <div class="container">
-      <!-- Brand Logo -->
-      <a class="navbar-brand d-flex align-items-center fw-bold fs-4 text-primary me-2 me-lg-4" href="javascript:void(0)" onclick="showView('storefront')">
-        <i class="bi bi-bag-heart-fill me-2 fs-3 text-primary"></i>
-        <span>Nova<span class="text-dark">Store</span></span>
+      <!-- Brand Logo (Image only) -->
+      <a class="navbar-brand d-flex align-items-center me-2 me-lg-4 p-0" href="javascript:void(0)" onclick="showView('storefront')" aria-label="NovaStore Home">
+        <img src="Logo.png" alt="NovaStore Logo" class="navbar-logo">
       </a>
 
       <!-- Mobile Top Bar Actions (Visible only on mobile/tablets < 992px) -->
@@ -513,9 +519,8 @@
       <div class="row g-4 mb-4">
         <!-- Col 1: Brand -->
         <div class="col-lg-4 col-md-6">
-          <a class="d-flex align-items-center fw-bold fs-4 text-white text-decoration-none mb-3" href="#home">
-            <i class="bi bi-bag-heart-fill me-2 fs-3 text-primary"></i>
-            <span>NovaStore</span>
+          <a class="d-inline-block mb-3" href="#home" onclick="showView('storefront')" aria-label="NovaStore Home">
+            <img src="Logo.png" alt="NovaStore Logo" class="footer-logo">
           </a>
           <p class="small text-secondary">
             NovaStore is a modern responsive e-commerce web application created with Bootstrap 5 and Vanilla JavaScript. Delivering premium goods worldwide.
