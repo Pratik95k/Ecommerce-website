@@ -1,12 +1,604 @@
 /**
  * NovaStore E-Commerce Application Frontend
- * Complete Full-Stack Integration with REST APIs, JWT Auth, SQLite Database, and Unified Dashboards.
+ * Complete Dual-Mode Architecture:
+ * - Server Mode: Communicates with Express + SQLite backend when running locally.
+ * - Static Fallback Mode: Seamless in-browser database (localStorage) when hosted on GitHub Pages.
  */
 
 // ==========================================
-// 1. APPLICATION STATE
+// 1. STATIC DATABASE ENGINE (FOR GITHUB PAGES)
 // ==========================================
-const API_BASE = ''; // Same origin
+const DEFAULT_PRODUCTS = [
+  {
+    id: 1,
+    name: "Wireless Noise-Canceling Headphones",
+    category: "Electronics",
+    price: 199.99,
+    stock: 35,
+    rating: 4.8,
+    reviews: 142,
+    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80",
+    description: "Premium over-ear headphones with active noise cancellation and 30h battery life."
+  },
+  {
+    id: 2,
+    name: "Designer Denim Jacket",
+    category: "Fashion",
+    price: 89.50,
+    stock: 18,
+    rating: 4.5,
+    reviews: 89,
+    image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=600&q=80",
+    description: "Classic vintage denim jacket made from 100% organic durable cotton."
+  },
+  {
+    id: 3,
+    name: "Ergonomic Performance Running Shoes",
+    category: "Shoes",
+    price: 120.00,
+    stock: 24,
+    rating: 4.7,
+    reviews: 210,
+    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80",
+    description: "Lightweight breathable mesh sneakers designed for maximum comfort and speed."
+  },
+  {
+    id: 4,
+    name: "Luxury Chronograph Wristwatch",
+    category: "Watches",
+    price: 249.99,
+    stock: 8,
+    rating: 4.9,
+    reviews: 74,
+    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80",
+    description: "Water-resistant stainless steel analog watch with genuine leather strap."
+  },
+  {
+    id: 5,
+    name: "Minimalist Ceramic Table Lamp",
+    category: "Home",
+    price: 59.99,
+    stock: 42,
+    rating: 4.6,
+    reviews: 63,
+    image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=600&q=80",
+    description: "Warm ambient LED lamp with sleek ceramic base for modern living rooms."
+  },
+  {
+    id: 6,
+    name: "Polarized UV400 Classic Sunglasses",
+    category: "Accessories",
+    price: 45.00,
+    stock: 55,
+    rating: 4.4,
+    reviews: 95,
+    image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=600&q=80",
+    description: "Glare-reducing polarized lenses with anti-scratch protective coating."
+  },
+  {
+    id: 7,
+    name: "Smart Fitness & Health Tracker Watch",
+    category: "Watches",
+    price: 129.99,
+    stock: 15,
+    rating: 4.7,
+    reviews: 184,
+    image: "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?auto=format&fit=crop&w=600&q=80",
+    description: "Heart rate monitor, step counter, sleep tracker, and AMOLED HD touchscreen."
+  },
+  {
+    id: 8,
+    name: "Genuine Leather Crossbody Shoulder Bag",
+    category: "Accessories",
+    price: 110.00,
+    stock: 12,
+    rating: 4.8,
+    reviews: 118,
+    image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=600&q=80",
+    description: "Handcrafted Italian leather shoulder bag with spacious organized compartments."
+  }
+];
+
+const DEFAULT_USERS = [
+  {
+    id: 1,
+    fullName: "Store Administrator",
+    email: "admin@novastore.com",
+    password: "Admin@12345",
+    role: "admin"
+  },
+  {
+    id: 2,
+    fullName: "Alex Johnson",
+    email: "customer@novastore.com",
+    password: "Customer@12345",
+    role: "customer"
+  }
+];
+
+const DEFAULT_ORDERS = [
+  {
+    id: 101,
+    userId: 2,
+    customer_name: "Alex Johnson",
+    customer_email: "customer@novastore.com",
+    shipping_address: "742 Evergreen Terrace, Springfield, OR",
+    payment_method: "card",
+    total_amount: 319.99,
+    status: "shipped",
+    created_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
+    items: [
+      { product_id: 1, product_name: "Wireless Noise-Canceling Headphones", price_at_purchase: 199.99, quantity: 1, image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80" },
+      { product_id: 3, product_name: "Ergonomic Performance Running Shoes", price_at_purchase: 120.00, quantity: 1, image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80" }
+    ]
+  },
+  {
+    id: 102,
+    userId: 2,
+    customer_name: "Alex Johnson",
+    customer_email: "customer@novastore.com",
+    shipping_address: "742 Evergreen Terrace, Springfield, OR",
+    payment_method: "paypal",
+    total_amount: 89.50,
+    status: "delivered",
+    created_at: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString(),
+    items: [
+      { product_id: 2, product_name: "Designer Denim Jacket", price_at_purchase: 89.50, quantity: 1, image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=600&q=80" }
+    ]
+  },
+  {
+    id: 103,
+    userId: null,
+    customer_name: "Sarah Connor",
+    customer_email: "sarah.c@example.com",
+    shipping_address: "104 Tech Boulevard, San Francisco, CA",
+    payment_method: "card",
+    total_amount: 249.99,
+    status: "processing",
+    created_at: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
+    items: [
+      { product_id: 4, product_name: "Luxury Chronograph Wristwatch", price_at_purchase: 249.99, quantity: 1, image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80" }
+    ]
+  }
+];
+
+class ClientDB {
+  static init() {
+    if (!localStorage.getItem('novastore_db_products')) {
+      localStorage.setItem('novastore_db_products', JSON.stringify(DEFAULT_PRODUCTS));
+    }
+    if (!localStorage.getItem('novastore_db_users')) {
+      localStorage.setItem('novastore_db_users', JSON.stringify(DEFAULT_USERS));
+    }
+    if (!localStorage.getItem('novastore_db_orders')) {
+      localStorage.setItem('novastore_db_orders', JSON.stringify(DEFAULT_ORDERS));
+    }
+    if (!localStorage.getItem('novastore_db_messages')) {
+      localStorage.setItem('novastore_db_messages', JSON.stringify([
+        { id: 1, name: "Morgan Riley", email: "morgan@example.com", subject: "Wholesale inquiry", message: "Hi NovaStore team, do you offer corporate bulk orders on headphones?", created_at: new Date().toISOString() }
+      ]));
+    }
+  }
+
+  static getProducts() {
+    this.init();
+    return JSON.parse(localStorage.getItem('novastore_db_products') || '[]');
+  }
+
+  static saveProducts(prods) {
+    localStorage.setItem('novastore_db_products', JSON.stringify(prods));
+  }
+
+  static getUsers() {
+    this.init();
+    return JSON.parse(localStorage.getItem('novastore_db_users') || '[]');
+  }
+
+  static saveUsers(users) {
+    localStorage.setItem('novastore_db_users', JSON.stringify(users));
+  }
+
+  static getOrders() {
+    this.init();
+    return JSON.parse(localStorage.getItem('novastore_db_orders') || '[]');
+  }
+
+  static saveOrders(orders) {
+    localStorage.setItem('novastore_db_orders', JSON.stringify(orders));
+  }
+
+  static getMessages() {
+    this.init();
+    return JSON.parse(localStorage.getItem('novastore_db_messages') || '[]');
+  }
+
+  static saveMessages(msgs) {
+    localStorage.setItem('novastore_db_messages', JSON.stringify(msgs));
+  }
+}
+
+// Initialize Client DB on load
+ClientDB.init();
+
+// ==========================================
+// 2. UNIFIED API SERVICE (DUAL MODE)
+// ==========================================
+let isServerOnline = false;
+
+const api = {
+  async init() {
+    if (window.location.protocol === 'file:' || window.location.hostname.includes('github.io')) {
+      isServerOnline = false;
+      this.updateStatusBadge();
+      return;
+    }
+    try {
+      const res = await fetch('/api/products', { signal: AbortSignal.timeout(2000) });
+      if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+        isServerOnline = true;
+      } else {
+        isServerOnline = false;
+      }
+    } catch {
+      isServerOnline = false;
+    }
+    this.updateStatusBadge();
+  },
+
+  updateStatusBadge() {
+    const badge = document.getElementById("dbStatusBadge");
+    if (badge) {
+      if (isServerOnline) {
+        badge.className = "badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill small";
+        badge.innerHTML = `<i class="bi bi-database-check me-1"></i> SQLite Server Connected`;
+      } else {
+        badge.className = "badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 rounded-pill small";
+        badge.innerHTML = `<i class="bi bi-cloud-check me-1"></i> GitHub Pages Storage Active`;
+      }
+    }
+  },
+
+  async login(email, password) {
+    if (isServerOnline) {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Authentication failed');
+      return data;
+    } else {
+      const users = ClientDB.getUsers();
+      const user = users.find(u => u.email.toLowerCase() === email.toLowerCase().trim() && u.password === password);
+      if (!user) throw new Error('Invalid email or password');
+      const token = 'static_token_' + btoa(user.email);
+      return {
+        token,
+        user: { id: user.id, fullName: user.fullName, email: user.email, role: user.role }
+      };
+    }
+  },
+
+  async register(fullName, email, password) {
+    if (isServerOnline) {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fullName, email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Registration failed');
+      return data;
+    } else {
+      const users = ClientDB.getUsers();
+      if (users.find(u => u.email.toLowerCase() === email.toLowerCase().trim())) {
+        throw new Error('An account with this email already exists.');
+      }
+      const newUser = {
+        id: Date.now(),
+        fullName: fullName.trim(),
+        email: email.toLowerCase().trim(),
+        password,
+        role: 'customer'
+      };
+      users.push(newUser);
+      ClientDB.saveUsers(users);
+      const token = 'static_token_' + btoa(newUser.email);
+      return {
+        token,
+        user: { id: newUser.id, fullName: newUser.fullName, email: newUser.email, role: newUser.role }
+      };
+    }
+  },
+
+  async getMe(token) {
+    if (isServerOnline) {
+      const res = await fetch('/api/auth/me', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Session invalid');
+      return await res.json();
+    } else {
+      if (!token.startsWith('static_token_')) throw new Error('Session invalid');
+      const email = atob(token.replace('static_token_', ''));
+      const users = ClientDB.getUsers();
+      const user = users.find(u => u.email === email);
+      if (!user) throw new Error('User not found');
+      return { user: { id: user.id, fullName: user.fullName, email: user.email, role: user.role } };
+    }
+  },
+
+  async getProducts() {
+    if (isServerOnline) {
+      const res = await fetch('/api/products');
+      if (!res.ok) throw new Error('Failed to load products');
+      return await res.json();
+    } else {
+      return ClientDB.getProducts();
+    }
+  },
+
+  async addProduct(productData, token) {
+    if (isServerOnline) {
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(productData)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to add product');
+      return data;
+    } else {
+      const prods = ClientDB.getProducts();
+      const newProd = {
+        id: Date.now(),
+        name: productData.name,
+        category: productData.category,
+        price: parseFloat(productData.price),
+        stock: parseInt(productData.stock) || 20,
+        rating: 5.0,
+        reviews: 1,
+        image: productData.image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80',
+        description: productData.description || ''
+      };
+      prods.unshift(newProd);
+      ClientDB.saveProducts(prods);
+      return { product: newProd };
+    }
+  },
+
+  async updateProduct(id, productData, token) {
+    if (isServerOnline) {
+      const res = await fetch(`/api/products/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(productData)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update product');
+      return data;
+    } else {
+      const prods = ClientDB.getProducts();
+      const idx = prods.findIndex(p => p.id == id);
+      if (idx === -1) throw new Error('Product not found');
+      prods[idx] = {
+        ...prods[idx],
+        name: productData.name,
+        category: productData.category,
+        price: parseFloat(productData.price),
+        stock: parseInt(productData.stock),
+        image: productData.image,
+        description: productData.description
+      };
+      ClientDB.saveProducts(prods);
+      return { product: prods[idx] };
+    }
+  },
+
+  async deleteProduct(id, token) {
+    if (isServerOnline) {
+      const res = await fetch(`/api/products/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Failed to delete product');
+      return await res.json();
+    } else {
+      let prods = ClientDB.getProducts();
+      prods = prods.filter(p => p.id != id);
+      ClientDB.saveProducts(prods);
+      return { success: true };
+    }
+  },
+
+  async createOrder(orderPayload, token) {
+    if (isServerOnline) {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(orderPayload)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Order failed');
+      return data;
+    } else {
+      const prods = ClientDB.getProducts();
+      let totalAmount = 0;
+      const orderItems = [];
+
+      for (const item of orderPayload.items) {
+        const p = prods.find(pr => pr.id == item.id);
+        if (!p) throw new Error(`Product not found`);
+        if (p.stock < item.quantity) throw new Error(`Insufficient stock for "${p.name}". Only ${p.stock} left.`);
+        p.stock -= item.quantity;
+        totalAmount += p.price * item.quantity;
+        orderItems.push({
+          product_id: p.id,
+          product_name: p.name,
+          price_at_purchase: p.price,
+          quantity: item.quantity,
+          image: p.image
+        });
+      }
+      ClientDB.saveProducts(prods);
+
+      const orders = ClientDB.getOrders();
+      const newOrder = {
+        id: Math.floor(100 + Math.random() * 900),
+        userId: currentUser ? currentUser.id : null,
+        customer_name: orderPayload.customerName,
+        customer_email: orderPayload.customerEmail,
+        shipping_address: orderPayload.shippingAddress,
+        payment_method: orderPayload.paymentMethod,
+        total_amount: totalAmount,
+        status: 'processing',
+        created_at: new Date().toISOString(),
+        items: orderItems
+      };
+      orders.unshift(newOrder);
+      ClientDB.saveOrders(orders);
+
+      return {
+        orderId: newOrder.id,
+        totalAmount,
+        status: newOrder.status
+      };
+    }
+  },
+
+  async getMyOrders(token) {
+    if (isServerOnline) {
+      const res = await fetch('/api/orders/my', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Failed to load orders');
+      return await res.json();
+    } else {
+      const orders = ClientDB.getOrders();
+      if (!currentUser) return [];
+      return orders.filter(o => o.userId == currentUser.id || o.customer_email.toLowerCase() === currentUser.email.toLowerCase());
+    }
+  },
+
+  async getAllOrders(token) {
+    if (isServerOnline) {
+      const res = await fetch('/api/orders', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Failed to load orders');
+      return await res.json();
+    } else {
+      return ClientDB.getOrders();
+    }
+  },
+
+  async updateOrderStatus(id, status, token) {
+    if (isServerOnline) {
+      const res = await fetch(`/api/orders/${id}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status })
+      });
+      if (!res.ok) throw new Error('Failed to update status');
+      return await res.json();
+    } else {
+      const orders = ClientDB.getOrders();
+      const ord = orders.find(o => o.id == id);
+      if (ord) ord.status = status;
+      ClientDB.saveOrders(orders);
+      return { order: ord };
+    }
+  },
+
+  async getAnalytics(token) {
+    if (isServerOnline) {
+      const res = await fetch('/api/admin/analytics', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Failed to load analytics');
+      return await res.json();
+    } else {
+      const orders = ClientDB.getOrders();
+      const prods = ClientDB.getProducts();
+      const users = ClientDB.getUsers();
+
+      const totalRevenue = orders
+        .filter(o => o.status !== 'cancelled')
+        .reduce((sum, o) => sum + Number(o.total_amount), 0);
+      const totalOrders = orders.length;
+      const totalCustomers = users.filter(u => u.role === 'customer').length;
+      const lowStockItems = prods.filter(p => p.stock <= 10);
+      const lowStockCount = lowStockItems.length;
+
+      // Category breakdown
+      const catMap = {};
+      prods.forEach(p => {
+        catMap[p.category] = (catMap[p.category] || 0) + 1;
+      });
+      const categoryStats = Object.keys(catMap).map(k => ({ category: k, count: catMap[k] }));
+
+      // Status breakdown
+      const statusMap = {};
+      orders.forEach(o => {
+        statusMap[o.status] = (statusMap[o.status] || 0) + 1;
+      });
+      const statusStats = Object.keys(statusMap).map(s => ({ status: s, count: statusMap[s] }));
+
+      return {
+        totalRevenue,
+        totalOrders,
+        totalCustomers,
+        lowStockCount,
+        lowStockItems,
+        categoryStats,
+        statusStats
+      };
+    }
+  },
+
+  async sendContact(data) {
+    if (isServerOnline) {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      return await res.json();
+    } else {
+      const msgs = ClientDB.getMessages();
+      msgs.unshift({ id: Date.now(), ...data, created_at: new Date().toISOString() });
+      ClientDB.saveMessages(msgs);
+      return { message: 'Thank you! Your message has been received.' };
+    }
+  },
+
+  async getMessages(token) {
+    if (isServerOnline) {
+      const res = await fetch('/api/admin/messages', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      return await res.json();
+    } else {
+      return ClientDB.getMessages();
+    }
+  }
+};
+
+// ==========================================
+// 3. APPLICATION STATE & DOM REFERENCES
+// ==========================================
 let currentUser = null;
 let authToken = localStorage.getItem('novastore_token') || null;
 let products = [];
@@ -19,9 +611,7 @@ let currentView = "storefront";
 let statusChartInstance = null;
 let categoryChartInstance = null;
 
-// ==========================================
-// 2. DOM ELEMENTS
-// ==========================================
+// DOM Elements
 const productGrid = document.getElementById("productGrid");
 const searchInput = document.getElementById("searchInput");
 const searchResultAlert = document.getElementById("searchResultAlert");
@@ -57,7 +647,7 @@ const customerDashboardView = document.getElementById("customerDashboardView");
 const adminDashboardView = document.getElementById("adminDashboardView");
 
 // ==========================================
-// 3. INITIALIZATION
+// 4. INITIALIZATION
 // ==========================================
 document.addEventListener("DOMContentLoaded", async () => {
   setupCategoryFilters();
@@ -67,6 +657,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupNavScroll();
   updateCartUI();
 
+  // Initialize and detect environment (Local Server vs GitHub Pages Static)
+  await api.init();
+
   // Validate existing auth session token if present
   if (authToken) {
     await checkAuthSession();
@@ -74,10 +667,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     updateNavAuthUI();
   }
 
-  // Load products from SQLite database
+  // Load products catalog
   await loadProducts();
 
-  // Listen to hash changes for direct deep linking
+  // Deep linking via URL hash
   handleHashNavigation();
   window.addEventListener('hashchange', handleHashNavigation);
 });
@@ -94,7 +687,7 @@ function handleHashNavigation() {
 }
 
 // ==========================================
-// 4. VIEW SWITCHER
+// 5. VIEW SWITCHER
 // ==========================================
 function showView(viewName) {
   currentView = viewName;
@@ -141,21 +734,13 @@ function showView(viewName) {
 }
 
 // ==========================================
-// 5. AUTHENTICATION SYSTEM
+// 6. AUTHENTICATION SYSTEM
 // ==========================================
 async function checkAuthSession() {
   try {
-    const res = await fetch(`${API_BASE}/api/auth/me`, {
-      headers: { 'Authorization': `Bearer ${authToken}` }
-    });
-    if (res.ok) {
-      const data = await res.json();
-      currentUser = data.user;
-    } else {
-      logout(false);
-    }
+    const data = await api.getMe(authToken);
+    currentUser = data.user;
   } catch (err) {
-    console.error('Session check failed:', err);
     logout(false);
   } finally {
     updateNavAuthUI();
@@ -276,7 +861,7 @@ function quickFillLogin(email, password) {
   }
   document.getElementById('loginEmail').value = email;
   document.getElementById('loginPassword').value = password;
-  showAuthAlert('Demo credentials filled! Click "Sign In" or submit to proceed.', 'alert-info');
+  showAuthAlert('Demo credentials filled! Click "Sign In" to proceed.', 'alert-info');
 }
 
 function showAuthAlert(message, alertClass = 'alert-danger') {
@@ -299,17 +884,7 @@ async function handleLogin(email, password) {
   submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Signing in...`;
 
   try {
-    const res = await fetch(`${API_BASE}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-    const data = await res.json();
-
-    if (!res.ok) {
-      showAuthAlert(data.error || 'Authentication failed. Please check credentials.');
-      return;
-    }
+    const data = await api.login(email, password);
 
     authToken = data.token;
     localStorage.setItem('novastore_token', authToken);
@@ -325,7 +900,7 @@ async function handleLogin(email, password) {
       showView('adminDashboard');
     }
   } catch (err) {
-    showAuthAlert('Network error during sign in. Ensure server is active.');
+    showAuthAlert(err.message || 'Authentication failed. Please check credentials.');
   } finally {
     submitBtn.disabled = false;
     submitBtn.innerHTML = 'Sign In';
@@ -339,17 +914,7 @@ async function handleRegister(fullName, email, password) {
   submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Creating account...`;
 
   try {
-    const res = await fetch(`${API_BASE}/api/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fullName, email, password })
-    });
-    const data = await res.json();
-
-    if (!res.ok) {
-      showAuthAlert(data.error || 'Registration failed.');
-      return;
-    }
+    const data = await api.register(fullName, email, password);
 
     authToken = data.token;
     localStorage.setItem('novastore_token', authToken);
@@ -361,7 +926,7 @@ async function handleRegister(fullName, email, password) {
 
     showToast(`Account created! Welcome, ${currentUser.fullName}!`, 'bi-stars');
   } catch (err) {
-    showAuthAlert('Network error during registration.');
+    showAuthAlert(err.message || 'Registration failed.');
   } finally {
     submitBtn.disabled = false;
     submitBtn.innerHTML = 'Create Account';
@@ -384,18 +949,15 @@ function logout(showFeedback = true) {
 }
 
 // ==========================================
-// 6. PRODUCT CATALOG & FILTERS (DATABASE-DRIVEN)
+// 7. PRODUCT CATALOG & FILTERS
 // ==========================================
 async function loadProducts() {
   try {
-    const res = await fetch(`${API_BASE}/api/products`);
-    if (res.ok) {
-      products = await res.json();
-      renderProducts();
-    }
+    products = await api.getProducts();
+    renderProducts();
   } catch (err) {
-    console.error('Error fetching products from server:', err);
-    showToast('Failed to load live catalog from database.', 'bi-exclamation-octagon');
+    console.error('Error loading products:', err);
+    showToast('Failed to load products.', 'bi-exclamation-octagon');
   }
 }
 
@@ -566,7 +1128,7 @@ function setupSearch() {
 }
 
 // ==========================================
-// 7. CART & ORDER MANAGEMENT
+// 8. CART & ORDER MANAGEMENT
 // ==========================================
 function addToCart(productId) {
   const targetProduct = products.find(p => p.id === productId);
@@ -697,7 +1259,7 @@ function setupCartActions() {
 }
 
 // ==========================================
-// 8. CUSTOMER DASHBOARD: ORDERS & TRACKING
+// 9. CUSTOMER DASHBOARD: ORDERS & TRACKING
 // ==========================================
 async function loadCustomerOrders() {
   if (!authToken) return;
@@ -706,19 +1268,13 @@ async function loadCustomerOrders() {
   container.innerHTML = `
     <div class="text-center py-5">
       <div class="spinner-border text-primary" role="status"></div>
-      <p class="text-muted small mt-2">Loading your orders from SQLite database...</p>
+      <p class="text-muted small mt-2">Loading orders...</p>
     </div>
   `;
 
   try {
-    const res = await fetch(`${API_BASE}/api/orders/my`, {
-      headers: { 'Authorization': `Bearer ${authToken}` }
-    });
-    if (!res.ok) throw new Error('Failed to load user orders');
+    const orders = await api.getMyOrders(authToken);
 
-    const orders = await res.json();
-
-    // Compute stats
     const totalOrdersCount = orders.length;
     const totalSpent = orders
       .filter(o => o.status !== 'cancelled')
@@ -748,8 +1304,7 @@ async function loadCustomerOrders() {
         day: 'numeric'
       });
 
-      // Stepper status logic
-      const status = order.status.toLowerCase();
+      const status = (order.status || 'processing').toLowerCase();
       let s1 = "completed", s2 = "", s3 = "", s4 = "";
 
       if (status === "processing") {
@@ -838,18 +1393,13 @@ async function loadCustomerOrders() {
 }
 
 // ==========================================
-// 9. ADMIN DASHBOARD & ANALYTICS
+// 10. ADMIN DASHBOARD & ANALYTICS
 // ==========================================
 async function loadAdminAnalytics() {
   if (!authToken || !currentUser || currentUser.role !== 'admin') return;
 
   try {
-    const res = await fetch(`${API_BASE}/api/admin/analytics`, {
-      headers: { 'Authorization': `Bearer ${authToken}` }
-    });
-    if (!res.ok) throw new Error('Failed to load analytics');
-
-    const data = await res.json();
+    const data = await api.getAnalytics(authToken);
 
     // 1. KPI Cards
     document.getElementById("kpiRevenue").textContent = `$${Number(data.totalRevenue).toFixed(2)}`;
@@ -897,7 +1447,6 @@ async function loadAdminAnalytics() {
 }
 
 function renderAdminCharts(data) {
-  // Chart 1: Order Status Distribution (Bar Chart)
   const ctxStatus = document.getElementById('orderStatusChart');
   if (ctxStatus) {
     if (statusChartInstance) statusChartInstance.destroy();
@@ -929,7 +1478,6 @@ function renderAdminCharts(data) {
     });
   }
 
-  // Chart 2: Category Distribution (Doughnut Chart)
   const ctxCat = document.getElementById('categoryChart');
   if (ctxCat) {
     if (categoryChartInstance) categoryChartInstance.destroy();
@@ -967,10 +1515,8 @@ async function loadAdminProducts() {
   tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary"></div> Loading inventory...</td></tr>`;
 
   try {
-    const res = await fetch(`${API_BASE}/api/products`);
-    const prods = await res.json();
+    const prods = await api.getProducts();
 
-    // Hook search input
     const searchField = document.getElementById("adminProductSearch");
     searchField.oninput = () => {
       const q = searchField.value.toLowerCase();
@@ -1032,18 +1578,8 @@ async function handleAddProduct(e) {
   const description = document.getElementById("addProdDesc").value;
 
   try {
-    const res = await fetch(`${API_BASE}/api/products`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`
-      },
-      body: JSON.stringify({ name, category, price, stock, image, description })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Failed to add product');
+    await api.addProduct({ name, category, price, stock, image, description }, authToken);
 
-    // Close modal & reload
     const modalEl = document.getElementById("addProductModal");
     bootstrap.Modal.getInstance(modalEl).hide();
     document.getElementById("addProductForm").reset();
@@ -1059,8 +1595,9 @@ async function handleAddProduct(e) {
 
 async function openEditProductModal(id) {
   try {
-    const res = await fetch(`${API_BASE}/api/products/${id}`);
-    const product = await res.json();
+    const prods = await api.getProducts();
+    const product = prods.find(p => p.id == id);
+    if (!product) throw new Error('Product not found');
 
     document.getElementById("editProdId").value = product.id;
     document.getElementById("editProdName").value = product.name;
@@ -1074,7 +1611,7 @@ async function openEditProductModal(id) {
     const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
     modal.show();
   } catch (err) {
-    alert('Failed to load product details.');
+    alert(err.message || 'Failed to load product details.');
   }
 }
 
@@ -1089,16 +1626,7 @@ async function handleEditProduct(e) {
   const description = document.getElementById("editProdDesc").value;
 
   try {
-    const res = await fetch(`${API_BASE}/api/products/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`
-      },
-      body: JSON.stringify({ name, category, price, stock, image, description })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Failed to update product');
+    await api.updateProduct(id, { name, category, price, stock, image, description }, authToken);
 
     const modalEl = document.getElementById("editProductModal");
     bootstrap.Modal.getInstance(modalEl).hide();
@@ -1116,11 +1644,7 @@ async function deleteProduct(id, name) {
   if (!confirm(`Are you sure you want to delete "${name}"? This action cannot be undone.`)) return;
 
   try {
-    const res = await fetch(`${API_BASE}/api/products/${id}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${authToken}` }
-    });
-    if (!res.ok) throw new Error('Failed to delete product');
+    await api.deleteProduct(id, authToken);
 
     showToast(`Product "${name}" deleted.`, 'bi-trash-fill');
     await loadProducts();
@@ -1141,10 +1665,7 @@ async function loadAdminOrders() {
   tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary"></div> Loading store orders...</td></tr>`;
 
   try {
-    const res = await fetch(`${API_BASE}/api/orders`, {
-      headers: { 'Authorization': `Bearer ${authToken}` }
-    });
-    const orders = await res.json();
+    const orders = await api.getAllOrders(authToken);
 
     if (orders.length === 0) {
       tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">No orders found.</td></tr>`;
@@ -1190,16 +1711,7 @@ async function loadAdminOrders() {
 
 async function updateOrderStatus(orderId, newStatus) {
   try {
-    const res = await fetch(`${API_BASE}/api/orders/${orderId}/status`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`
-      },
-      body: JSON.stringify({ status: newStatus })
-    });
-    if (!res.ok) throw new Error('Failed to update status');
-
+    await api.updateOrderStatus(orderId, newStatus, authToken);
     showToast(`Order #${orderId} marked as ${newStatus}.`, 'bi-check-circle-fill');
     loadAdminAnalytics();
   } catch (err) {
@@ -1217,10 +1729,7 @@ async function loadAdminMessages() {
   tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary"></div> Loading inquiries...</td></tr>`;
 
   try {
-    const res = await fetch(`${API_BASE}/api/admin/messages`, {
-      headers: { 'Authorization': `Bearer ${authToken}` }
-    });
-    const msgs = await res.json();
+    const msgs = await api.getMessages(authToken);
 
     if (msgs.length === 0) {
       tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">No contact messages received.</td></tr>`;
@@ -1248,10 +1757,9 @@ async function loadAdminMessages() {
 }
 
 // ==========================================
-// 10. FORMS & CHECKOUT SUBMISSION
+// 11. FORMS & CHECKOUT SUBMISSION
 // ==========================================
 function setupForms() {
-  // Login Form
   const loginForm = document.getElementById("loginForm");
   if (loginForm) {
     loginForm.addEventListener("submit", (e) => {
@@ -1262,7 +1770,6 @@ function setupForms() {
     });
   }
 
-  // Register Form
   const registerForm = document.getElementById("registerForm");
   if (registerForm) {
     registerForm.addEventListener("submit", (e) => {
@@ -1274,19 +1781,16 @@ function setupForms() {
     });
   }
 
-  // Add Product Form
   const addProdForm = document.getElementById("addProductForm");
   if (addProdForm) {
     addProdForm.addEventListener("submit", handleAddProduct);
   }
 
-  // Edit Product Form
   const editProdForm = document.getElementById("editProductForm");
   if (editProdForm) {
     editProdForm.addEventListener("submit", handleEditProduct);
   }
 
-  // Checkout Form Submission to Server
   if (checkoutForm) {
     checkoutForm.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -1303,9 +1807,6 @@ function setupForms() {
         submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Placing Order...`;
 
         try {
-          const headers = { 'Content-Type': 'application/json' };
-          if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
-
           const payload = {
             customerName,
             customerEmail,
@@ -1317,34 +1818,23 @@ function setupForms() {
             }))
           };
 
-          const res = await fetch(`${API_BASE}/api/orders`, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify(payload)
-          });
-          const data = await res.json();
+          const data = await api.createOrder(payload, authToken);
 
-          if (!res.ok) throw new Error(data.error || 'Failed to place order.');
-
-          // Close Checkout modal
           const modalEl = document.getElementById("checkoutModal");
           const modalInstance = bootstrap.Modal.getInstance(modalEl);
           if (modalInstance) modalInstance.hide();
 
-          // Reset cart & form
           cart = [];
           saveCart();
           updateCartUI();
           checkoutForm.reset();
           checkoutForm.classList.remove("was-validated");
 
-          // Reload products so live stock counts are refreshed!
           await loadProducts();
 
           alert(`🎉 Order Placed Successfully!\n\nOrder ID: #${data.orderId}\nTotal: $${Number(data.totalAmount).toFixed(2)}\n\nA confirmation receipt has been sent to ${customerEmail}.`);
           showToast(`Order #${data.orderId} placed successfully!`, "bi-check-circle-fill");
 
-          // If customer is logged in, show their order tracking dashboard!
           if (currentUser) {
             showView('customerDashboard');
           }
@@ -1360,7 +1850,6 @@ function setupForms() {
     });
   }
 
-  // Contact Form Submission to Server
   if (contactForm) {
     contactForm.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -1373,12 +1862,7 @@ function setupForms() {
         const message = document.getElementById("contactMessage").value;
 
         try {
-          const res = await fetch(`${API_BASE}/api/contact`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, subject, message })
-          });
-          const data = await res.json();
+          const data = await api.sendContact({ name, email, subject, message });
           showToast(data.message || 'Thank you! Your message has been sent.', "bi-send-check-fill");
           contactForm.reset();
           contactForm.classList.remove("was-validated");
@@ -1393,7 +1877,7 @@ function setupForms() {
 }
 
 // ==========================================
-// 11. TOAST HELPER & NAVBAR SCROLL
+// 12. TOAST HELPER & NAVBAR SCROLL
 // ==========================================
 function showToast(message, iconClass = "bi-info-circle-fill") {
   const toastEl = document.getElementById("liveToast");
