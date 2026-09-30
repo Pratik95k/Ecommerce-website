@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Discover premium quality products at NovaStore - Modern E-Commerce shopping experience with fast delivery and great deals.">
+  <title>NovaStore | Modern E-Commerce Store</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Chart.js for Admin Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- 1. NAVIGATION BAR -->
+  <nav class="navbar navbar-expand-lg fixed-top shadow-sm border-bottom" id="mainNavbar">
+    <div class="container">
+      <!-- Brand Logo -->
+      <a class="navbar-brand d-flex align-items-center fw-bold fs-4 text-primary me-2 me-lg-4" href="javascript:void(0)" onclick="showView('storefront')">
+        <i class="bi bi-bag-heart-fill me-2 fs-3 text-primary"></i>
+        <span>Nova<span class="text-dark">Store</span></span>
+      </a>
+
+      <!-- Mobile Top Bar Actions (Visible only on mobile/tablets < 992px) -->
+      <div class="d-flex align-items-center gap-2 d-lg-none ms-auto me-2">
+        <!-- Mobile Cart Button -->
+        <button class="btn btn-light border rounded-pill position-relative px-2 py-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas" aria-controls="cartOffcanvas" aria-label="View Cart">
+          <i class="bi bi-cart3 fs-5 text-dark"></i>
+          <span id="mobileCartBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">0</span>
+        </button>
+
+        <!-- Mobile User Avatar / Sign-In Button -->
+        <div id="mobileUserContainer">
+          <button class="btn btn-outline-primary btn-sm rounded-pill px-2 py-1" type="button" data-bs-toggle="modal" data-bs-target="#authModal" aria-label="Sign In">
+            <i class="bi bi-person fs-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Hamburger Toggler -->
+      <button class="navbar-toggler border-0 p-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Navbar Collapsible Menu -->
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <!-- Essential Primary Links Only -->
+        <ul class="navbar-nav me-auto mb-3 mb-lg-0 ms-lg-3">
+          <li class="nav-item">
+            <a class="nav-link active" id="navLinkHome" href="javascript:void(0)" onclick="showView('storefront')">
+              <i class="bi bi-house-door me-2 d-lg-none"></i>Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="navLinkShop" href="#products" onclick="showView('storefront')">
+              <i class="bi bi-grid me-2 d-lg-none"></i>Shop Products
+            </a>
+          </li>
+          <li class="nav-item" id="navCustomerDashboardLink" style="display: none;">
+            <a class="nav-link fw-semibold text-primary" href="javascript:void(0)" onclick="showView('customerDashboard')">
+              <i class="bi bi-bag-check me-2 d-lg-none"></i>My Orders
+            </a>
+          </li>
+          <li class="nav-item" id="navAdminDashboardLink" style="display: none;">
+            <a class="nav-link fw-semibold text-primary" href="javascript:void(0)" onclick="showView('adminDashboard')">
+              <i class="bi bi-speedometer2 me-2 d-lg-none"></i>Admin Hub
+            </a>
+          </li>
+        </ul>
+
+        <!-- Search Bar -->
+        <div class="search-wrapper mb-3 mb-lg-0 me-lg-3">
+          <div class="input-group input-group-sm">
+            <span class="input-group-text bg-light border-end-0 text-muted ps-3">
+              <i class="bi bi-search"></i>
+            </span>
+            <input type="search" id="searchInput" class="form-control bg-light border-start-0 ps-1" placeholder="Search catalog..." aria-label="Search products">
+          </div>
+        </div>
+
+        <!-- Desktop Controls (Cart & User Dropdown) -->
+        <div class="d-none d-lg-flex align-items-center gap-2">
+          <!-- Cart Button -->
+          <button class="btn btn-primary d-flex align-items-center rounded-pill px-3 py-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas" aria-controls="cartOffcanvas">
+            <i class="bi bi-cart3 me-2 fs-5"></i>
+            <span class="fw-semibold">Cart</span>
+            <span id="cartBadge" class="badge bg-white text-primary rounded-circle ms-2 px-2 py-1">0</span>
+          </button>
+
+          <!-- Auth Button (Shown when logged out) -->
+          <button class="btn btn-outline-primary d-flex align-items-center rounded-pill px-3 py-2" id="navAuthBtn" type="button" data-bs-toggle="modal" data-bs-target="#authModal">
+            <i class="bi bi-person me-1 fs-5"></i>
+            <span class="fw-semibold">Sign In</span>
+          </button>
+
+          <!-- User Dropdown (Shown when logged in) -->
+          <div class="dropdown d-none" id="navUserDropdown">
+            <button class="btn btn-light border rounded-pill d-flex align-items-center gap-2 px-3 py-1 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <div class="avatar-circle" id="navUserAvatar">A</div>
+              <div class="text-start d-none d-xl-block">
+                <div class="fw-bold small lh-1" id="navUserName">User</div>
+                <small class="text-muted" style="font-size: 0.7rem;" id="navUserRole">Customer</small>
+              </div>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 mt-2 p-2" style="min-width: 220px;">
+              <li class="dropdown-header small fw-semibold text-muted text-truncate" id="navUserEmail">user@example.com</li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <a class="dropdown-item rounded-3 py-2 d-flex align-items-center" href="javascript:void(0)" onclick="showView('customerDashboard')">
+                  <i class="bi bi-bag-check me-2 text-primary"></i> My Orders & Profile
+                </a>
+              </li>
+              <li id="menuAdminLink" style="display: none;">
+                <a class="dropdown-item rounded-3 py-2 d-flex align-items-center" href="javascript:void(0)" onclick="showView('adminDashboard')">
+                  <i class="bi bi-speedometer2 me-2 text-primary"></i> Admin Hub
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item rounded-3 py-2 d-flex align-items-center" href="javascript:void(0)" onclick="showView('storefront')">
+                  <i class="bi bi-shop me-2 text-muted"></i> Storefront View
+                </a>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <button class="dropdown-item rounded-3 py-2 text-danger d-flex align-items-center" onclick="logout()">
+                  <i class="bi bi-box-arrow-right me-2"></i> Sign Out
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Mobile Drawer Account Section (Shown inside hamburger menu on mobile) -->
+        <div class="d-lg-none border-top pt-3 mt-2" id="mobileDrawerAccountSection">
+          <!-- Populated by script.js with quick sign in or user status -->
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN STOREFRONT VIEW WRAPPER -->
+  <div id="storefrontView">
+
+    <!-- 2. HERO SECTION -->
+    <section class="hero-section" id="home">
+    <div class="container py-4 py-md-5">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+          <span class="badge bg-primary-subtle text-primary fw-semibold px-3 py-2 rounded-pill mb-3">
+            <i class="bi bi-stars me-1"></i> New Season Arrivals 2026
+          </span>
+          <h1 class="hero-title display-4 mb-3">
+            Elevate Your Everyday Style & Experience
+          </h1>
+          <p class="lead text-muted mb-4">
+            Discover our curated collection of premium electronics, fashion, accessories, and home essentials crafted to elevate your modern lifestyle.
+          </p>
+          <div class="d-flex flex-wrap gap-3">
+            <a href="#products" class="btn btn-primary btn-lg rounded-pill px-4 py-3 shadow-sm fw-semibold">
+              <i class="bi bi-bag-check me-2"></i> Shop Now
+            </a>
+            <a href="#categories" class="btn btn-outline-secondary btn-lg rounded-pill px-4 py-3 fw-semibold">
+              Explore Categories
+            </a>
+          </div>
+          <div class="row mt-5 pt-3 border-top text-center text-sm-start">
+            <div class="col-4">
+              <h3 class="fw-bold mb-0">10k+</h3>
+              <small class="text-muted">Happy Customers</small>
+            </div>
+            <div class="col-4">
+              <h3 class="fw-bold mb-0">500+</h3>
+              <small class="text-muted">Top Products</small>
+            </div>
+            <div class="col-4">
+              <h3 class="fw-bold mb-0">4.9/5</h3>
+              <small class="text-muted">Customer Rating</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="hero-img-container">
+            <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1000&q=80" alt="NovaStore Modern Shopping Banner" class="hero-img">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. CATEGORIES SECTION -->
+  <section class="py-5 bg-light border-top border-bottom" id="categories">
+    <div class="container py-4">
+      <div class="text-center mb-5">
+        <h2 class="fw-bold">Shop by Category</h2>
+        <p class="text-muted">Explore popular collections handpicked for your lifestyle</p>
+      </div>
+
+      <div class="row g-3 g-md-4 text-center">
+        <!-- Category 1 -->
+        <div class="col-6 col-md-4 col-lg-2">
+          <div class="category-card p-3" data-category="Electronics">
+            <div class="category-icon-wrapper">
+              <i class="bi bi-laptop"></i>
+            </div>
+            <h6 class="fw-semibold mb-1">Electronics</h6>
+            <small class="text-muted">Gadgets & Gear</small>
+          </div>
+        </div>
+        <!-- Category 2 -->
+        <div class="col-6 col-md-4 col-lg-2">
+          <div class="category-card p-3" data-category="Fashion">
+            <div class="category-icon-wrapper">
+              <i class="bi bi-bag-dash"></i>
+            </div>
+            <h6 class="fw-semibold mb-1">Fashion</h6>
+            <small class="text-muted">Apparel & Wear</small>
+          </div>
+        </div>
+        <!-- Category 3 -->
+        <div class="col-6 col-md-4 col-lg-2">
+          <div class="category-card p-3" data-category="Shoes">
+            <div class="category-icon-wrapper">
+              <i class="bi bi-person-walking"></i>
+            </div>
+            <h6 class="fw-semibold mb-1">Shoes</h6>
+            <small class="text-muted">Sneakers & Boots</small>
+          </div>
+        </div>
+        <!-- Category 4 -->
+        <div class="col-6 col-md-4 col-lg-2">
+          <div class="category-card p-3" data-category="Watches">
+            <div class="category-icon-wrapper">
+              <i class="bi bi-stopwatch"></i>
+            </div>
+            <h6 class="fw-semibold mb-1">Watches</h6>
+            <small class="text-muted">Smart & Luxury</small>
+          </div>
+        </div>
+        <!-- Category 5 -->
+        <div class="col-6 col-md-4 col-lg-2">
+          <div class="category-card p-3" data-category="Home">
+            <div class="category-icon-wrapper">
+              <i class="bi bi-house-heart"></i>
+            </div>
+            <h6 class="fw-semibold mb-1">Home</h6>
+            <small class="text-muted">Decor & Lighting</small>
+          </div>
+        </div>
+        <!-- Category 6 -->
+        <div class="col-6 col-md-4 col-lg-2">
+          <div class="category-card p-3" data-category="Accessories">
+            <div class="category-icon-wrapper">
+              <i class="bi bi-sunglasses"></i>
+            </div>
+            <h6 class="fw-semibold mb-1">Accessories</h6>
+            <small class="text-muted">Bags & Glasses</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. FEATURED PRODUCTS SECTION -->
+  <section class="py-5" id="products">
+    <div class="container py-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div>
+          <h2 class="fw-bold mb-1">Featured Products</h2>
+          <p class="text-muted mb-0">Handcrafted quality items curated for you</p>
+        </div>
+
+        <!-- Filter Buttons (Smooth Horizontal Scroll on Mobile) -->
+        <div class="d-flex flex-nowrap flex-md-wrap gap-2 mt-3 mt-md-0 overflow-x-auto pb-2 filter-buttons-scroll" id="categoryFilterButtons">
+          <button class="btn btn-primary filter-btn active text-nowrap" data-filter="All">All</button>
+          <button class="btn btn-outline-secondary filter-btn text-nowrap" data-filter="Electronics">Electronics</button>
+          <button class="btn btn-outline-secondary filter-btn text-nowrap" data-filter="Fashion">Fashion</button>
+          <button class="btn btn-outline-secondary filter-btn text-nowrap" data-filter="Shoes">Shoes</button>
+          <button class="btn btn-outline-secondary filter-btn text-nowrap" data-filter="Watches">Watches</button>
+          <button class="btn btn-outline-secondary filter-btn text-nowrap" data-filter="Home">Home</button>
+          <button class="btn btn-outline-secondary filter-btn text-nowrap" data-filter="Accessories">Accessories</button>
+        </div>
+      </div>
+
+      <!-- Search results alert banner -->
+      <div id="searchResultAlert" class="alert alert-info d-none d-flex align-items-center justify-content-between mb-4" role="alert">
+        <span>Showing search results for "<strong id="searchTermText"></strong>"</span>
+        <button type="button" class="btn-close" id="clearSearchBtn" aria-label="Clear search"></button>
+      </div>
+
+      <!-- Product Grid Container -->
+      <div class="row g-4" id="productGrid">
+        <!-- Dynamic Product Cards Injected by JavaScript -->
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. SHOPPING CART (OFFCANVAS) -->
+  <div class="offcanvas offcanvas-end shadow" tabindex="-1" id="cartOffcanvas" aria-labelledby="cartOffcanvasLabel">
+    <div class="offcanvas-header border-bottom">
+      <h5 class="offcanvas-title fw-bold d-flex align-items-center" id="cartOffcanvasLabel">
+        <i class="bi bi-cart-check text-primary me-2 fs-4"></i> Shopping Cart
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body d-flex flex-column justify-content-between p-3" id="cartOffcanvasBody">
+      <!-- Cart Items Container -->
+      <div id="cartItemsContainer" class="flex-grow-1 overflow-auto pe-1">
+        <!-- Dynamic Cart Items injected here -->
+      </div>
+
+      <!-- Cart Summary Footer -->
+      <div class="border-top pt-3 mt-3">
+        <div class="d-flex justify-content-between mb-2">
+          <span class="text-muted">Total Items:</span>
+          <span id="cartTotalItems" class="fw-semibold">0</span>
+        </div>
+        <div class="d-flex justify-content-between mb-3 fs-5">
+          <span class="fw-bold">Total Price:</span>
+          <span id="cartTotalPrice" class="fw-bold text-primary">$0.00</span>
+        </div>
+        <div class="d-grid gap-2">
+          <button id="checkoutBtn" class="btn btn-primary btn-lg rounded-pill fw-semibold" data-bs-toggle="modal" data-bs-target="#checkoutModal" disabled>
+            Proceed to Checkout
+          </button>
+          <button id="clearCartBtn" class="btn btn-outline-danger btn-sm rounded-pill" disabled>
+            Clear Cart
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKOUT MODAL -->
+  <div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content rounded-4 shadow">
+        <div class="modal-header border-bottom">
+          <h5 class="modal-title fw-bold" id="checkoutModalLabel">
+            <i class="bi bi-credit-card-2-front text-primary me-2"></i> Complete Your Order
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="row g-4">
+            <!-- Order Summary Column -->
+            <div class="col-md-5 order-md-2 bg-light p-3 rounded-3 border">
+              <h6 class="fw-bold mb-3">Order Summary</h6>
+              <div id="checkoutSummaryItems" class="mb-3 overflow-auto" style="max-height: 200px;">
+                <!-- Summary items injected here -->
+              </div>
+              <div class="border-top pt-2">
+                <div class="d-flex justify-content-between fw-bold fs-6">
+                  <span>Grand Total:</span>
+                  <span id="checkoutGrandTotal" class="text-primary">$0.00</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Shipping Form Column -->
+            <div class="col-md-7 order-md-1">
+              <form id="checkoutForm" class="needs-validation" novalidate>
+                <h6 class="fw-bold mb-3">Shipping Details</h6>
+                <div class="mb-3">
+                  <label for="checkoutName" class="form-label">Full Name</label>
+                  <input type="text" class="form-control" id="checkoutName" required>
+                  <div class="invalid-feedback">Please enter your full name.</div>
+                </div>
+                <div class="mb-3">
+                  <label for="checkoutEmail" class="form-label">Email Address</label>
+                  <input type="email" class="form-control" id="checkoutEmail" required>
+                  <div class="invalid-feedback">Please enter a valid email address.</div>
+                </div>
+                <div class="mb-3">
+                  <label for="checkoutAddress" class="form-label">Shipping Address</label>
+                  <textarea class="form-control" id="checkoutAddress" rows="2" required></textarea>
+                  <div class="invalid-feedback">Please provide your shipping address.</div>
+                </div>
+                <div class="mb-3">
+                  <label for="checkoutPayment" class="form-label">Payment Method</label>
+                  <select class="form-select" id="checkoutPayment" required>
+                    <option value="" selected disabled>Select payment method</option>
+                    <option value="card">Credit / Debit Card</option>
+                    <option value="paypal">PayPal</option>
+                    <option value="cod">Cash on Delivery</option>
+                  </select>
+                  <div class="invalid-feedback">Please select a payment method.</div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-semibold mt-2">
+                  Confirm & Place Order
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. ABOUT SECTION -->
+  <section class="py-5 bg-light border-top border-bottom" id="about">
+    <div class="container py-4">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+          <span class="badge bg-primary text-white mb-2 px-3 py-2 rounded-pill">About NovaStore</span>
+          <h2 class="fw-bold display-6 mb-3">Your Premier Shopping Destination</h2>
+          <p class="text-muted">
+            Founded with a passion for quality and innovation, NovaStore connects customers with handpicked products from top global creators. We combine style, functionality, and affordability to deliver an unforgettable shopping journey.
+          </p>
+          <p class="text-muted">
+            Whether you are looking for state-of-the-art tech gadgets, trendy fashion, or chic home decorations, NovaStore promises effortless browsing and fast, reliable delivery right to your doorstep.
+          </p>
+        </div>
+        <div class="col-lg-6">
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <div class="feature-box text-center">
+                <i class="bi bi-truck text-primary fs-1 mb-2"></i>
+                <h6 class="fw-bold">Free Express Delivery</h6>
+                <small class="text-muted">On all orders over $50 with live tracking</small>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="feature-box text-center">
+                <i class="bi bi-shield-check text-primary fs-1 mb-2"></i>
+                <h6 class="fw-bold">Secure Payment</h6>
+                <small class="text-muted">256-bit encrypted checkout protection</small>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="feature-box text-center">
+                <i class="bi bi-arrow-counterclockwise text-primary fs-1 mb-2"></i>
+                <h6 class="fw-bold">30 Days Money Back</h6>
+                <small class="text-muted">Hassle-free 100% money refund policy</small>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="feature-box text-center">
+                <i class="bi bi-headset text-primary fs-1 mb-2"></i>
+                <h6 class="fw-bold">24/7 Dedicated Support</h6>
+                <small class="text-muted">Our support team is always online to help</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. CONTACT SECTION -->
+  <section class="py-5" id="contact">
+    <div class="container py-4">
+      <div class="row justify-content-center">
+        <div class="col-lg-8 text-center mb-4">
+          <h2 class="fw-bold">Get In Touch</h2>
+          <p class="text-muted">Have a question or feedback? We would love to hear from you!</p>
+        </div>
+      </div>
+
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="card border-0 shadow-sm p-4 p-md-5 rounded-4">
+            <form id="contactForm" class="needs-validation" novalidate>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="contactName" class="form-label fw-semibold">Your Name</label>
+                  <input type="text" class="form-control" id="contactName" placeholder="John Doe" required>
+                  <div class="invalid-feedback">Please enter your name.</div>
+                </div>
+                <div class="col-md-6">
+                  <label for="contactEmail" class="form-label fw-semibold">Email Address</label>
+                  <input type="email" class="form-control" id="contactEmail" placeholder="john@example.com" required>
+                  <div class="invalid-feedback">Please enter a valid email address.</div>
+                </div>
+                <div class="col-12">
+                  <label for="contactSubject" class="form-label fw-semibold">Subject</label>
+                  <input type="text" class="form-control" id="contactSubject" placeholder="How can we help?" required>
+                  <div class="invalid-feedback">Please enter a subject.</div>
+                </div>
+                <div class="col-12">
+                  <label for="contactMessage" class="form-label fw-semibold">Message</label>
+                  <textarea class="form-control" id="contactMessage" rows="4" placeholder="Write your message here..." required></textarea>
+                  <div class="invalid-feedback">Please write a message.</div>
+                </div>
+                <div class="col-12 text-center mt-4">
+                  <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 fw-semibold shadow-sm">
+                    <i class="bi bi-send me-2"></i> Send Message
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. FOOTER -->
+  <footer class="pt-5 pb-4">
+    <div class="container">
+      <div class="row g-4 mb-4">
+        <!-- Col 1: Brand -->
+        <div class="col-lg-4 col-md-6">
+          <a class="d-flex align-items-center fw-bold fs-4 text-white text-decoration-none mb-3" href="#home">
+            <i class="bi bi-bag-heart-fill me-2 fs-3 text-primary"></i>
+            <span>NovaStore</span>
+          </a>
+          <p class="small text-secondary">
+            NovaStore is a modern responsive e-commerce web application created with Bootstrap 5 and Vanilla JavaScript. Delivering premium goods worldwide.
+          </p>
+          <div class="d-flex gap-2 mt-3">
+            <a href="#" class="social-icon" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+            <a href="#" class="social-icon" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
+            <a href="#" class="social-icon" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+            <a href="#" class="social-icon" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+          </div>
+        </div>
+
+        <!-- Col 2: Quick Links -->
+        <div class="col-lg-2 col-md-6">
+          <h6 class="fw-bold text-white mb-3">Quick Links</h6>
+          <ul class="list-unstyled small d-flex flex-column gap-2 mb-0">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#categories">Categories</a></li>
+            <li><a href="#products">Products</a></li>
+            <li><a href="#about">About Us</a></li>
+            <li><a href="#contact">Contact Support</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Product Categories -->
+        <div class="col-lg-3 col-md-6">
+          <h6 class="fw-bold text-white mb-3">Top Categories</h6>
+          <ul class="list-unstyled small d-flex flex-column gap-2 mb-0">
+            <li><a href="#products" onclick="filterProductsByCategory('Electronics')">Electronics</a></li>
+            <li><a href="#products" onclick="filterProductsByCategory('Fashion')">Fashion Apparel</a></li>
+            <li><a href="#products" onclick="filterProductsByCategory('Shoes')">Footwear & Shoes</a></li>
+            <li><a href="#products" onclick="filterProductsByCategory('Watches')">Watches & Smartwear</a></li>
+            <li><a href="#products" onclick="filterProductsByCategory('Home')">Home & Living</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4: Newsletter -->
+        <div class="col-lg-3 col-md-6">
+          <h6 class="fw-bold text-white mb-3">Newsletter</h6>
+          <p class="small text-secondary">Subscribe to receive updates, access to exclusive deals, and more.</p>
+          <form onsubmit="event.preventDefault(); alert('Thank you for subscribing!');">
+            <div class="input-group input-group-sm mb-2">
+              <input type="email" class="form-control" placeholder="Enter your email" required>
+              <button class="btn btn-primary" type="submit">Join</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <hr class="border-secondary my-4">
+
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center small text-secondary">
+        <p class="mb-2 mb-md-0">&copy; 2026 NovaStore Inc. All rights reserved.</p>
+        <div>
+          <a href="#" class="me-3 text-secondary">Privacy Policy</a>
+          <a href="#" class="me-3 text-secondary">Terms of Service</a>
+          <a href="#" class="text-secondary">Cookie Preferences</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  </div> <!-- END #storefrontView -->
+
+  <!-- ========================================================
+       CUSTOMER DASHBOARD VIEW
+       ======================================================== -->
+  <div id="customerDashboardView" class="container py-5 my-5 d-none">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 border-bottom pb-4">
+      <div>
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="avatar-circle fs-4" style="width: 52px; height: 52px;" id="custHeaderAvatar">A</div>
+          <div>
+            <h2 class="fw-bold mb-0" id="custHeaderName">Welcome back!</h2>
+            <div class="text-muted small" id="custHeaderEmail">customer@example.com</div>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <div class="bg-light border rounded-4 px-3 py-2 text-center">
+          <small class="text-muted d-block">Total Orders</small>
+          <span class="fw-bold fs-5 text-primary" id="custStatsTotalOrders">0</span>
+        </div>
+        <div class="bg-light border rounded-4 px-3 py-2 text-center">
+          <small class="text-muted d-block">Total Spent</small>
+          <span class="fw-bold fs-5 text-success" id="custStatsTotalSpent">$0.00</span>
+        </div>
+        <button class="btn btn-outline-primary rounded-pill px-3 py-2 fw-semibold" onclick="showView('storefront')">
+          <i class="bi bi-arrow-left me-1"></i> Continue Shopping
+        </button>
+      </div>
+    </div>
+
+    <!-- Orders Section -->
+    <div class="mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold mb-0"><i class="bi bi-bag-check-fill text-primary me-2"></i>My Orders & Tracking</h4>
+        <button class="btn btn-sm btn-light border rounded-pill px-3" onclick="loadCustomerOrders()">
+          <i class="bi bi-arrow-clockwise me-1"></i> Refresh Orders
+        </button>
+      </div>
+
+      <!-- Container for Dynamic Order Cards -->
+      <div id="customerOrdersContainer">
+        <!-- Rendered dynamically by script.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       ADMIN HUB DASHBOARD VIEW
+       ======================================================== -->
+  <div id="adminDashboardView" class="container-fluid py-4 px-md-5 my-5 d-none">
+    <!-- Admin Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom">
+      <div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-primary px-3 py-2 rounded-pill"><i class="bi bi-shield-lock-fill me-1"></i> Administrator Hub</span>
+          <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill small">
+            <i class="bi bi-database-check me-1"></i> SQLite DB Connected
+          </span>
+        </div>
+        <h2 class="fw-bold mt-2 mb-1">Store Management & Analytics</h2>
+        <p class="text-muted small mb-0">Monitor live store metrics, manage catalog items, and process orders in real time.</p>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-primary rounded-pill px-4 fw-semibold" data-bs-toggle="modal" data-bs-target="#addProductModal">
+          <i class="bi bi-plus-circle me-1"></i> Add New Product
+        </button>
+        <button class="btn btn-outline-secondary rounded-pill px-3" onclick="showView('storefront')">
+          <i class="bi bi-shop me-1"></i> Storefront View
+        </button>
+      </div>
+    </div>
+
+    <!-- Admin Navigation Tabs (Horizontally scrollable on mobile) -->
+    <ul class="nav nav-pills nav-pills-admin flex-nowrap overflow-x-auto gap-2 mb-4 border-bottom pb-3 nav-pills-scroll" id="adminTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active text-nowrap" id="tab-overview-btn" data-bs-toggle="pill" data-bs-target="#admin-tab-overview" type="button" role="tab" onclick="loadAdminAnalytics()">
+          <i class="bi bi-graph-up"></i> Analytics & KPIs
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link text-nowrap" id="tab-products-btn" data-bs-toggle="pill" data-bs-target="#admin-tab-products" type="button" role="tab" onclick="loadAdminProducts()">
+          <i class="bi bi-box-seam"></i> Product Inventory
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link text-nowrap" id="tab-orders-btn" data-bs-toggle="pill" data-bs-target="#admin-tab-orders" type="button" role="tab" onclick="loadAdminOrders()">
+          <i class="bi bi-receipt"></i> Order Fulfillment
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link text-nowrap" id="tab-messages-btn" data-bs-toggle="pill" data-bs-target="#admin-tab-messages" type="button" role="tab" onclick="loadAdminMessages()">
+          <i class="bi bi-chat-left-text"></i> Customer Inquiries
+        </button>
+      </li>
+    </ul>
+
+    <!-- Admin Tab Content -->
+    <div class="tab-content" id="adminTabContent">
+      <!-- 1. OVERVIEW & ANALYTICS TAB -->
+      <div class="tab-pane fade show active" id="admin-tab-overview" role="tabpanel">
+        <!-- 4 KPI Cards -->
+        <div class="row g-4 mb-4">
+          <div class="col-sm-6 col-xl-3">
+            <div class="admin-card p-4 d-flex align-items-center justify-content-between">
+              <div>
+                <small class="text-muted text-uppercase fw-bold" style="font-size: 0.75rem;">Total Revenue</small>
+                <h3 class="fw-bold mb-0 text-dark" id="kpiRevenue">$0.00</h3>
+                <small class="text-success fw-semibold"><i class="bi bi-arrow-up-right me-1"></i>Live from SQLite DB</small>
+              </div>
+              <div class="kpi-icon-box kpi-purple">
+                <i class="bi bi-cash-stack"></i>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="admin-card p-4 d-flex align-items-center justify-content-between">
+              <div>
+                <small class="text-muted text-uppercase fw-bold" style="font-size: 0.75rem;">Total Orders</small>
+                <h3 class="fw-bold mb-0 text-dark" id="kpiOrders">0</h3>
+                <small class="text-muted fw-semibold">Processed store orders</small>
+              </div>
+              <div class="kpi-icon-box kpi-emerald">
+                <i class="bi bi-bag-check"></i>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="admin-card p-4 d-flex align-items-center justify-content-between">
+              <div>
+                <small class="text-muted text-uppercase fw-bold" style="font-size: 0.75rem;">Registered Customers</small>
+                <h3 class="fw-bold mb-0 text-dark" id="kpiCustomers">0</h3>
+                <small class="text-muted fw-semibold">Authenticated users</small>
+              </div>
+              <div class="kpi-icon-box kpi-sky">
+                <i class="bi bi-people"></i>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="admin-card p-4 d-flex align-items-center justify-content-between">
+              <div>
+                <small class="text-muted text-uppercase fw-bold" style="font-size: 0.75rem;">Low Stock Alerts</small>
+                <h3 class="fw-bold mb-0 text-danger" id="kpiLowStock">0</h3>
+                <small class="text-muted fw-semibold">&le; 10 units remaining</small>
+              </div>
+              <div class="kpi-icon-box kpi-amber">
+                <i class="bi bi-exclamation-triangle"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row g-4 mb-4">
+          <div class="col-lg-8">
+            <div class="admin-card p-4 h-100">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0">Order Status Distribution</h6>
+                <span class="badge bg-light text-muted border">Real-time Data</span>
+              </div>
+              <div style="height: 280px; position: relative;">
+                <canvas id="orderStatusChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="admin-card p-4 h-100">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0">Products by Category</h6>
+                <span class="badge bg-light text-muted border">Inventory</span>
+              </div>
+              <div style="height: 280px; position: relative;" class="d-flex justify-content-center align-items-center">
+                <canvas id="categoryChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Low Stock Items Warning Table -->
+        <div class="admin-card p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h6 class="fw-bold mb-1 text-danger d-flex align-items-center">
+                <i class="bi bi-bell-fill me-2"></i> Inventory Attention Needed
+              </h6>
+              <p class="text-muted small mb-0">Products with stock at or below 10 units</p>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table admin-table align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Current Stock</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="lowStockTableBody">
+                <!-- Injected dynamically by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. PRODUCT INVENTORY MANAGEMENT TAB (CRUD) -->
+      <div class="tab-pane fade" id="admin-tab-products" role="tabpanel">
+        <div class="admin-card p-4">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div class="d-flex flex-wrap align-items-center gap-2 flex-grow-1" style="max-width: 500px;">
+              <div class="input-group input-group-sm">
+                <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control bg-light border-start-0 ps-0" id="adminProductSearch" placeholder="Search catalog by name or category...">
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm rounded-pill px-3 fw-semibold" data-bs-toggle="modal" data-bs-target="#addProductModal">
+              <i class="bi bi-plus-lg me-1"></i> Add Product
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table admin-table align-middle mb-0">
+              <thead>
+                <tr>
+                  <th style="width: 60px;">Image</th>
+                  <th>Name</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                  <th>Rating</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminProductsTableBody">
+                <!-- Injected dynamically by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. ORDER FULFILLMENT TAB -->
+      <div class="tab-pane fade" id="admin-tab-orders" role="tabpanel">
+        <div class="admin-card p-4">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h5 class="fw-bold mb-1">Customer Orders</h5>
+              <p class="text-muted small mb-0">Update fulfillment status and view line items</p>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="loadAdminOrders()">
+              <i class="bi bi-arrow-clockwise me-1"></i> Reload
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table admin-table align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Date</th>
+                  <th>Total</th>
+                  <th>Payment</th>
+                  <th>Items</th>
+                  <th>Fulfillment Status</th>
+                </tr>
+              </thead>
+              <tbody id="adminOrdersTableBody">
+                <!-- Injected dynamically by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. CUSTOMER INQUIRIES TAB -->
+      <div class="tab-pane fade" id="admin-tab-messages" role="tabpanel">
+        <div class="admin-card p-4">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h5 class="fw-bold mb-1">Contact Messages & Feedback</h5>
+              <p class="text-muted small mb-0">Inquiries submitted via contact form</p>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="loadAdminMessages()">
+              <i class="bi bi-arrow-clockwise me-1"></i> Reload
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table admin-table align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Sender</th>
+                  <th>Email</th>
+                  <th>Subject</th>
+                  <th>Message</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="adminMessagesTableBody">
+                <!-- Injected dynamically by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       AUTHENTICATION MODAL (SIGN IN / REGISTER)
+       ======================================================== -->
+  <div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 shadow border-0 overflow-hidden">
+        <div class="modal-header border-0 pb-0">
+          <ul class="nav nav-tabs auth-nav-tabs w-100" id="authTabs" role="tablist">
+            <li class="nav-item w-50 text-center" role="presentation">
+              <button class="nav-link active w-100" id="login-tab-btn" data-bs-toggle="tab" data-bs-target="#login-tab-pane" type="button" role="tab">Sign In</button>
+            </li>
+            <li class="nav-item w-50 text-center" role="presentation">
+              <button class="nav-link w-100" id="register-tab-btn" data-bs-toggle="tab" data-bs-target="#register-tab-pane" type="button" role="tab">Create Account</button>
+            </li>
+          </ul>
+          <button type="button" class="btn-close position-absolute end-0 top-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body p-4">
+          <!-- Auth Alert message banner -->
+          <div id="authAlert" class="alert d-none small py-2" role="alert"></div>
+
+          <div class="tab-content" id="authTabsContent">
+            <!-- Sign In Pane -->
+            <div class="tab-pane fade show active" id="login-tab-pane" role="tabpanel">
+              <!-- Demo Credentials Quick Chips -->
+              <div class="p-3 mb-3 rounded-3 bg-light border">
+                <small class="fw-bold text-muted d-block mb-2">⚡ Quick 1-Click Demo Login:</small>
+                <div class="d-flex flex-wrap gap-2">
+                  <span class="demo-chip px-3 py-1 rounded-pill" onclick="quickFillLogin('admin@novastore.com', 'Admin@12345')">
+                    <i class="bi bi-shield-check text-primary me-1"></i> Demo Admin
+                  </span>
+                  <span class="demo-chip px-3 py-1 rounded-pill" onclick="quickFillLogin('customer@novastore.com', 'Customer@12345')">
+                    <i class="bi bi-person text-success me-1"></i> Demo Customer
+                  </span>
+                </div>
+              </div>
+
+              <form id="loginForm">
+                <div class="mb-3">
+                  <label for="loginEmail" class="form-label small fw-semibold">Email address</label>
+                  <input type="email" class="form-control rounded-3" id="loginEmail" placeholder="name@example.com" required>
+                </div>
+                <div class="mb-3">
+                  <label for="loginPassword" class="form-label small fw-semibold">Password</label>
+                  <input type="password" class="form-control rounded-3" id="loginPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-semibold mt-2 shadow-sm" id="loginSubmitBtn">
+                  Sign In
+                </button>
+              </form>
+            </div>
+
+            <!-- Create Account Pane -->
+            <div class="tab-pane fade" id="register-tab-pane" role="tabpanel">
+              <form id="registerForm">
+                <div class="mb-3">
+                  <label for="registerName" class="form-label small fw-semibold">Full Name</label>
+                  <input type="text" class="form-control rounded-3" id="registerName" placeholder="Alex Johnson" required>
+                </div>
+                <div class="mb-3">
+                  <label for="registerEmail" class="form-label small fw-semibold">Email address</label>
+                  <input type="email" class="form-control rounded-3" id="registerEmail" placeholder="alex@example.com" required>
+                </div>
+                <div class="mb-3">
+                  <label for="registerPassword" class="form-label small fw-semibold">Password (min 6 chars)</label>
+                  <input type="password" class="form-control rounded-3" id="registerPassword" placeholder="••••••••" minlength="6" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-semibold mt-2 shadow-sm" id="registerSubmitBtn">
+                  Create Account
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       ADMIN: ADD PRODUCT MODAL
+       ======================================================== -->
+  <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 shadow border-0">
+        <div class="modal-header border-bottom">
+          <h5 class="modal-title fw-bold" id="addProductModalLabel">
+            <i class="bi bi-box-seam text-primary me-2"></i> Add New Product
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="addProductForm">
+          <div class="modal-body p-4">
+            <div class="mb-3">
+              <label for="addProdName" class="form-label small fw-semibold">Product Name</label>
+              <input type="text" class="form-control" id="addProdName" required placeholder="e.g. Ultra HD Wireless Earbuds">
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="addProdCategory" class="form-label small fw-semibold">Category</label>
+                <select class="form-select" id="addProdCategory" required>
+                  <option value="Electronics">Electronics</option>
+                  <option value="Fashion">Fashion</option>
+                  <option value="Shoes">Shoes</option>
+                  <option value="Watches">Watches</option>
+                  <option value="Home">Home</option>
+                  <option value="Accessories">Accessories</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="addProdPrice" class="form-label small fw-semibold">Price ($ USD)</label>
+                <input type="number" step="0.01" min="0.01" class="form-control" id="addProdPrice" required placeholder="99.99">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="addProdStock" class="form-label small fw-semibold">Stock Quantity</label>
+              <input type="number" min="0" class="form-control" id="addProdStock" value="30" required>
+            </div>
+            <div class="mb-3">
+              <label for="addProdImage" class="form-label small fw-semibold">Image URL (Unsplash or direct URL)</label>
+              <input type="url" class="form-control" id="addProdImage" placeholder="https://images.unsplash.com/..." required>
+            </div>
+            <div class="mb-3">
+              <label for="addProdDesc" class="form-label small fw-semibold">Description</label>
+              <textarea class="form-control" id="addProdDesc" rows="3" placeholder="Brief description of the product..."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer border-top">
+            <button type="button" class="btn btn-outline-secondary rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold">Save Product</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       ADMIN: EDIT PRODUCT MODAL
+       ======================================================== -->
+  <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 shadow border-0">
+        <div class="modal-header border-bottom">
+          <h5 class="modal-title fw-bold" id="editProductModalLabel">
+            <i class="bi bi-pencil-square text-primary me-2"></i> Edit Product
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="editProductForm">
+          <input type="hidden" id="editProdId">
+          <div class="modal-body p-4">
+            <div class="mb-3">
+              <label for="editProdName" class="form-label small fw-semibold">Product Name</label>
+              <input type="text" class="form-control" id="editProdName" required>
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="editProdCategory" class="form-label small fw-semibold">Category</label>
+                <select class="form-select" id="editProdCategory" required>
+                  <option value="Electronics">Electronics</option>
+                  <option value="Fashion">Fashion</option>
+                  <option value="Shoes">Shoes</option>
+                  <option value="Watches">Watches</option>
+                  <option value="Home">Home</option>
+                  <option value="Accessories">Accessories</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="editProdPrice" class="form-label small fw-semibold">Price ($ USD)</label>
+                <input type="number" step="0.01" min="0.01" class="form-control" id="editProdPrice" required>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="editProdStock" class="form-label small fw-semibold">Stock Quantity</label>
+              <input type="number" min="0" class="form-control" id="editProdStock" required>
+            </div>
+            <div class="mb-3">
+              <label for="editProdImage" class="form-label small fw-semibold">Image URL</label>
+              <input type="url" class="form-control" id="editProdImage" required>
+            </div>
+            <div class="mb-3">
+              <label for="editProdDesc" class="form-label small fw-semibold">Description</label>
+              <textarea class="form-control" id="editProdDesc" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer border-top">
+            <button type="button" class="btn btn-outline-secondary rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold">Update Product</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER FOR NOTIFICATIONS -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;">
+    <div id="liveToast" class="toast align-items-center text-white bg-primary border-0 rounded-3 shadow" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body d-flex align-items-center">
+          <i class="bi bi-check-circle-fill me-2 fs-5" id="toastIcon"></i>
+          <span id="toastMessage">Action completed successfully!</span>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5.3 Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Custom JavaScript -->
+  <script src="script.js"></script>
+</body>
+</html>
