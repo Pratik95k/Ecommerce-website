@@ -1,4 +1,8 @@
-# 🛍️ NovaStore — Full-Stack E-Commerce Platform
+<p align="center">
+  <img src="Logo.png" alt="NovaStore Logo" width="340">
+</p>
+
+# NovaStore — Full-Stack E-Commerce Platform
 
 NovaStore is a modern, responsive, full-stack e-commerce web application with embedded SQLite persistence, secure JWT authentication with Role-Based Access Control (RBAC), customer order tracking, and an executive administration dashboard.
 
